@@ -1,3 +1,3 @@
-services/inventory_service/inventory_env/
-services/inventory_service/__pycache__/
-*.pyc
+services/inventory_service/inventory_env/ 
+services/inventory_service/__pycache__/ 
+*.pyc 

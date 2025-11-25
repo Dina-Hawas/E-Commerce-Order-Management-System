@@ -1,3 +1,14 @@
 services/inventory_service/inventory_env/ 
 services/inventory_service/__pycache__/ 
 *.pyc 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+order_env/
+*/order_env/
+venv/
+.env/
+.env*/

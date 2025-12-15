@@ -2,9 +2,11 @@ from flask import Flask, jsonify, request
 import requests
 import uuid
 from datetime import datetime
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
+# ---------
 orders_db = {}  # In-memory DB
 
 INVENTORY_VALIDATE_URL = "http://localhost:5002/api/inventory/validate"

@@ -2,9 +2,10 @@ from flask import Flask, jsonify, request
 import mysql.connector
 from mysql.connector import Error
 from db_config import DB_CONFIG
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+CORS(app)
 # ---------------------------
 #  DATABASE CONNECTION
 # ---------------------------
@@ -98,6 +99,38 @@ def update_inventory(product_id):
     except Error as e:
         return jsonify({"error": f"MySQL Error: {str(e)}"}), 500
 
+# -------------------------------
+# GET ALL PRODUCTS
+# -------------------------------
+@app.route('/api/inventory/all', methods=['GET'])
+def get_all_inventory():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        query = """
+            SELECT id,
+                   product_name,
+                   quantity_available,
+                   unit_price
+            FROM inventory
+        """
+        cursor.execute(query)
+        products = cursor.fetchall()
+
+        return jsonify(products), 200
+
+    except Exception as e:
+        return jsonify({
+            "error": "Failed to fetch inventory",
+            "details": str(e)
+        }), 500
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
 
 # ---------------------------
 #  ENDPOINT FOR ORDER SERVICE

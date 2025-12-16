@@ -7,8 +7,6 @@
     <meta charset="utf-8"/>
     <title>Product Catalog</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://repo1.maven.org/maven2/org/json/json/20240303/json-20240303.jar
-"/>
 
 
 </head>

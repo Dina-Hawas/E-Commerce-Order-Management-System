@@ -9,5 +9,8 @@
         <module name="ecommerce-teamd" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="frontendJSP" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

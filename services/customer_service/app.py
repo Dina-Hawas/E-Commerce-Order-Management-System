@@ -29,38 +29,38 @@ def get_customer(customer_id):
 
 
 
-# @app.route('/api/customers/<int:customer_id>/orders', methods=['GET'])
-# def get_customer_orders(customer_id):
+@app.route('/api/customers/<int:customer_id>/orders', methods=['GET'])
+def get_customer_orders(customer_id):
 
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM customers WHERE id = %s", (customer_id,))
-#     customer = cursor.fetchone()
-#     conn.close()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM customers WHERE id = %s", (customer_id,))
+    customer = cursor.fetchone()
+    conn.close()
 
-#     if not customer:
-#         return jsonify({"error": "Customer not found"}), 404
+    if not customer:
+        return jsonify({"error": "Customer not found"}), 404
 
 
-#     try:
-#         response = requests.get(f"http://localhost:5001/api/orders/{customer_id}")
-#     except:
-#         return jsonify({"error": "Order Service unavailable"}), 503
+    try:
+        response = requests.get(f"http://localhost:5001/api/orders?customer_id={customer_id}")
+    except:
+        return jsonify({"error": "Order Service unavailable"}), 503
 
-#     if response.status_code != 200:
-#         return jsonify({"error": "Order Service error"}), 500
+    if response.status_code != 200:
+        return jsonify({"error": "Order Service error"}), 500
 
-#     orders = response.json()
+    orders = response.json()
 
  
-#     return jsonify({
-#         "customer": {
-#             "customer_id": customer["id"],
-#             "name": customer["name"],
-#             "email": customer["email"]
-#         },
-#         "orders": orders
-#     }), 200
+    return jsonify({
+        "customer": {
+            "customer_id": customer["id"],
+            "name": customer["name"],
+            "email": customer["email"]
+        },
+        "orders": orders
+    }), 200
 
 
 

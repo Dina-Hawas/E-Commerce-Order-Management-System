@@ -1,6 +1,8 @@
-
+<%@ page import="org.json.JSONObject" %>
+<%@ page import="org.json.JSONArray" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
+
 <html>
 <head>
     <meta charset="utf-8"/>
@@ -15,6 +17,31 @@
 
 <p>
     <strong>Order ID:</strong> ${orderId}
+    <br/>
+    <strong>status:</strong> ${status}
+    <br/>
+    <strong>timestamp:</strong> ${timestamp}
+    <br/>
+    <%
+        JSONArray items = (JSONArray) request.getAttribute("items");
+
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject item = items.getJSONObject(i);
+    %>
+
+    <strong>product:</strong><%= item.getString("produc_name") %>
+    <br/>
+    <strong>unit price:</strong><%= item.getDouble("unit_price") %>
+    <br/>
+    <strong>quantity:</strong><%= item.getInt("quantity") %>
+    <br/>
+    <strong>total price after discount:</strong><%= item.getDouble("total_after_discount") %>
+    <br/>
+
+    <%
+        }
+    %>
+
 </p>
 
 <form action="${pageContext.request.contextPath}/sendNotification" method="post">

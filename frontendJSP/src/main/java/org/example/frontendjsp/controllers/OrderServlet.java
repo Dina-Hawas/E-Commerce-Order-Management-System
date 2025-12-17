@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @WebServlet("/submitOrder")
@@ -46,6 +47,18 @@ public class OrderServlet extends HttpServlet {
 
             request.setAttribute("orderId", json.getString("order_id"));
             request.setAttribute("customerId", json.getInt("customer_id"));
+            request.setAttribute("status", json.getString("status"));
+            request.setAttribute("timestamp", json.getString("timestamp"));
+
+// Pricing object
+            JSONObject pricing = json.getJSONObject("pricing");
+            request.setAttribute("subtotal", pricing.getDouble("subtotal"));
+            request.setAttribute("taxAmount", pricing.getDouble("tax_amount"));
+            request.setAttribute("grandTotal", pricing.getDouble("grand_total"));
+
+// Items array
+            JSONArray items = pricing.getJSONArray("items");
+            request.setAttribute("items", items);
 
             request.getRequestDispatcher("/confirmation.jsp").forward(request, response);
 

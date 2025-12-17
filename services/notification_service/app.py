@@ -34,27 +34,25 @@ def send_notification():
     if not order_id or not customer_id:
         return jsonify({"error": "Missing parameters"}), 400
 
-    # --- 1️⃣ Call Customer Service ----
     customer_res = requests.get(f"http://localhost:5004/api/customers/{customer_id}")
     customer_data = customer_res.json()
 
-    # --- 2️⃣ Call Inventory Service (example: check product 1 delivery availability) ----
-    inventory_res = requests.get("http://localhost:5002/api/inventory/check/1")
+    order_res =requests.get(f"http://localhost:5001/api/orders/{order_id}")
+    order_data = order_res.json()
+    product_id = order_data['products'][0]['product_id']
+    inventory_res = requests.get(f"http://localhost:5002/api/inventory/check/{product_id}")
     inventory_data = inventory_res.json()
 
-    # --- 3️⃣ Build Notification Message ----
     message = (
         f"Order #{order_id} confirmed for customer {customer_data['name']}.\n"
         f"Email: {customer_data['email']}\n"
         f"Stock Status: {inventory_data}"
     )
 
-    # print("\n========== EMAIL SIMULATION ==========")
     print("TO:", customer_data["email"])
     print("MESSAGE:", message)
     print("=====================================\n")
 
-    # --- 4️⃣ Insert into notification_log ----
     cursor.execute(
         "INSERT INTO notification_log (customer_id, message) VALUES (%s, %s)",
         (customer_id, message)

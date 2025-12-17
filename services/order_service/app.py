@@ -80,6 +80,22 @@ def create_order():
 
         orders_db[order_id] = order
 
+        #  UPDATE INVENTORY 
+        for product in products:
+            product_id = product["product_id"]
+            ordered_qty = product["quantity"]
+
+            inv_check = requests.get(
+                f"http://localhost:5002/api/inventory/check/{product_id}"
+            )
+            inv_data = inv_check.json()
+
+            new_qty = inv_data["quantity_available"] - ordered_qty
+
+            requests.put(
+                f"http://localhost:5002/api/inventory/update/{product_id}",
+                json={"quantity_available": new_qty}
+            )
         return jsonify(order), 201
 
     except KeyError as e:

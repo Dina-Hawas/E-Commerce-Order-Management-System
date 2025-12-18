@@ -52,6 +52,7 @@ public class OrderServlet extends HttpServlet {
 
 // Pricing object
             JSONObject pricing = json.getJSONObject("pricing");
+            request.setAttribute("pricing", pricing);
             request.setAttribute("subtotal", pricing.getDouble("subtotal"));
             request.setAttribute("taxAmount", pricing.getDouble("tax_amount"));
             request.setAttribute("grandTotal", pricing.getDouble("grand_total"));

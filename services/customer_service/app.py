@@ -96,7 +96,9 @@ def update_loyalty(customer_id):
     return jsonify({
         "message": "Loyalty points updated successfully",
         "customer_id": customer_id,
-        "added_points": new_points
+        "customer_name": customer["name"],
+        "added_points": new_points,
+        "total_points": customer["loyalty_points"] + new_points,
     }), 200
 
 

@@ -18,11 +18,9 @@
 <p>
     <strong>Order ID:</strong> ${orderId}
     <br/>
-    <strong>status:</strong> ${status}
-    <br/>
-    <strong>timestamp:</strong> ${timestamp}
-    <br/>
+
     <%
+        JSONObject pricing = (JSONObject) request.getAttribute("pricing");
         JSONArray items = (JSONArray) request.getAttribute("items");
 
         for (int i = 0; i < items.length(); i++) {
@@ -36,6 +34,14 @@
     <strong>quantity:</strong><%= item.getInt("quantity") %>
     <br/>
     <strong>total price after discount:</strong><%= item.getDouble("total_after_discount") %>
+    <br/>
+    <strong>tax amount:</strong> <%= pricing.getDouble("tax_amount")%>
+    <br/>
+    <strong>grand total:</strong> <%= pricing.getDouble("grand_total")%>
+    <br/>
+    <strong>status:</strong> ${status}
+    <br/>
+    <strong>timestamp:</strong> ${timestamp}
     <br/>
 
     <%

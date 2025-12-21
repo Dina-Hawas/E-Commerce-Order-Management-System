@@ -51,6 +51,8 @@
 </head>
 
 <body class="container py-4">
+<a class="btn btn-outline-primary" href="<%=request.getContextPath()%>/profile?customer_id=1">Profile</a>
+<a class="btn btn-outline-secondary" href="<%=request.getContextPath()%>/ordersHistory?customer_id=1">Orders History</a>
 
 <h1 class="mb-4">Product Catalog</h1>
 

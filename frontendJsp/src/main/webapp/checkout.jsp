@@ -27,7 +27,13 @@
         <input class="form-control" type="number" name="quantity"  min="1" required />
     </div>
 
-    <button class="btn btn-success" type="submit">Place Order</button>
+    <div class="mt-3 d-flex gap-2">
+        <button class="btn btn-success" type="submit">Place Order</button>
+        <a class="btn btn-secondary" href="<%= request.getContextPath() %>/products">Cancel Order</a>
+    </div>
+
+
+
 </form>
 
 </body>

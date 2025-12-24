@@ -23,21 +23,44 @@
     for (int i = 0; i < orders.length(); i++) {
         JSONObject o = orders.getJSONObject(i);
 %>
+
 <div class="card p-3 mb-3">
-    <p><strong>Order ID:</strong> <%= o.optString("order_id", o.optString("_id", "N/A")) %></p>
-    <p><strong>Status:</strong> <%= o.optString("status", "N/A") %></p>
-    <p><strong>Timestamp:</strong> <%= o.optString("timestamp", o.optString("created_at", "N/A")) %></p>
+    <p><strong>Order ID:</strong> <%= o.optString("order_id") %></p>
+    <p><strong>Status:</strong> <%= o.optString("status") %></p>
+    <p><strong>Timestamp:</strong> <%= o.optString("timestamp") %></p>
 
     <%
-        // If order details include totals
         JSONObject pricing = o.optJSONObject("pricing");
         if (pricing != null) {
+            JSONArray items = pricing.optJSONArray("items");
+            if (items != null) {
+                for (int j = 0; j < items.length(); j++) {
+                    JSONObject item = items.getJSONObject(j);
     %>
+    <hr/>
+    <%
+
+
+
+    %>
+
+    <p><strong>Product:</strong> <%=item.optString("produc_name") %></p>
+    <p><strong>Unit Price:</strong> <%= item.optDouble("unit_price") %></p>
+    <p><strong>Quantity:</strong> <%= item.optInt("quantity") %></p>
+    <p><strong>Total After Discount:</strong> <%= item.optDouble("total_after_discount") %></p>
+
+    <%
+            }
+        }
+    %>
+    <hr/>
+    <p><strong>Tax:</strong> <%= pricing.optDouble("tax_amount") %></p>
     <p><strong>Grand Total:</strong> <%= pricing.optDouble("grand_total") %></p>
     <%
         }
     %>
 </div>
+
 <%
         }
     }

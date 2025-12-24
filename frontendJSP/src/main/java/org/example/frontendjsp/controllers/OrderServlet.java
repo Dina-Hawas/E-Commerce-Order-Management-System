@@ -18,53 +18,72 @@ import org.json.JSONObject;
 @WebServlet("/submitOrder")
 public class OrderServlet extends HttpServlet {
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         int customerId = Integer.parseInt(request.getParameter("customer_id"));
-        int productId = Integer.parseInt(request.getParameter("product_id"));
-        int quantity = Integer.parseInt(request.getParameter("quantity"));
 
-        // Build JSON payload
-        String jsonPayload = String.format(
-                "{\"customer_id\":%s,\"products\":[{\"product_id\":%s,\"quantity\":%s}]}",
-                customerId, productId, quantity
-        );
+        String[] productIds = request.getParameterValues("product_id[]");
+        String[] quantities = request.getParameterValues("quantity[]");
+
+        if (productIds == null || quantities == null || productIds.length != quantities.length) {
+            request.setAttribute("errorMessage", "Invalid order data.");
+            request.getRequestDispatcher("/checkout.jsp").forward(request, response);
+            return;
+        }
+
+        // Build products array
+        JSONArray productsArray = new JSONArray();
+
+        for (int i = 0; i < productIds.length; i++) {
+            JSONObject item = new JSONObject();
+            item.put("product_id", Integer.parseInt(productIds[i]));
+            item.put("quantity", Integer.parseInt(quantities[i]));
+            productsArray.put(item);
+        }
+
+        // Final payload
+        JSONObject payload = new JSONObject();
+        payload.put("customer_id", customerId);
+        payload.put("products", productsArray);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest orderReq = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:5001/api/orders/create"))
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
                 .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
                 .build();
 
         try {
-            HttpResponse<String> orderRes = client.send(orderReq, HttpResponse.BodyHandlers.ofString());
-            System.out.println("Order Service Response: " + orderRes.body());
+            HttpResponse<String> orderRes =
+                    client.send(orderReq, HttpResponse.BodyHandlers.ofString());
+
+            if (orderRes.statusCode() != 201) {
+                request.setAttribute(
+                        "errorMessage",
+                        "Requested quantity exceeds available stock."
+                );
+                request.getRequestDispatcher("/checkout.jsp").forward(request, response);
+                return;
+            }
 
             JSONObject json = new JSONObject(orderRes.body());
-
 
             request.setAttribute("orderId", json.getString("order_id"));
             request.setAttribute("customerId", json.getInt("customer_id"));
             request.setAttribute("status", json.getString("status"));
             request.setAttribute("timestamp", json.getString("timestamp"));
 
-// Pricing object
             JSONObject pricing = json.getJSONObject("pricing");
-            request.setAttribute("pricing", pricing);
             request.setAttribute("subtotal", pricing.getDouble("subtotal"));
             request.setAttribute("taxAmount", pricing.getDouble("tax_amount"));
             request.setAttribute("grandTotal", pricing.getDouble("grand_total"));
-
-// Items array
-            JSONArray items = pricing.getJSONArray("items");
-            request.setAttribute("items", items);
+            request.setAttribute("items", pricing.getJSONArray("items"));
 
             request.getRequestDispatcher("/confirmation.jsp").forward(request, response);
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
             response.sendError(500, "Order service unavailable.");
         }
     }

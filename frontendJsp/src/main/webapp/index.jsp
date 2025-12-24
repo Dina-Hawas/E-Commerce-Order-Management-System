@@ -51,8 +51,13 @@
 </head>
 
 <body class="container py-4">
-<a class="btn btn-outline-primary" href="<%=request.getContextPath()%>/profile?customer_id=1">Profile</a>
-<a class="btn btn-outline-secondary" href="<%=request.getContextPath()%>/ordersHistory?customer_id=1">Orders History</a>
+
+<div class="d-flex gap-2 mb-4">
+  <a class="btn btn-outline-primary"
+     href="<%=request.getContextPath()%>/profile?customer_id=1">Profile</a>
+  <a class="btn btn-outline-secondary"
+     href="<%=request.getContextPath()%>/ordersHistory?customer_id=1">Orders History</a>
+</div>
 
 <h1 class="mb-4">Product Catalog</h1>
 
@@ -61,40 +66,57 @@
   if (productsJson == null) productsJson = "[]";
 %>
 
-<div id="products"></div>
+<form action="checkout.jsp" method="post">
+  <div id="products" class="row row-cols-1 g-3"></div>
+
+  <div class="text-end mt-4">
+    <button type="submit" class="btn btn-success btn-lg">
+      Proceed to Checkout
+    </button>
+  </div>
+</form>
 
 <script>
   const products = <%= productsJson %>;
   const root = document.getElementById("products");
 
   if (!Array.isArray(products)) {
-    root.innerHTML = `<div class="alert alert-danger">
-            <b>Error:</b> Inventory service did not return a JSON array.
-        </div>`;
+    root.innerHTML = `
+      <div class="col">
+        <div class="alert alert-danger">
+          Inventory service did not return valid data.
+        </div>
+      </div>`;
   } else if (products.length === 0) {
-    root.innerHTML = `<div class="alert alert-warning">
+    root.innerHTML = `<div class="col"><div class="alert alert-warning">
             No products found (or you opened index.jsp directly instead of /products).
-        </div>`;
+        </div></div>`;
   } else {
-    root.innerHTML = products.map(p => `
+    root.innerHTML = products.filter(p => p.quantity_available> 0).map(p => `
+        <div class="col">
           <div class="product-card shadow-sm">
-            <div class="product-title">\${p.product_name || ""}</div>
-            <div class="meta-row meta">
-              <span><b>ID:</b> \${p.product_id ?? ""}</span>
-              <span><b>Price:</b> \$\${p.unit_price ?? ""}</span>
-              <span><b>Available:</b> \${p.quantity_available ?? ""}</span>
+            <div class="card-body">
+              <div class="form-check">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="selectedProduct"
+                       value="\${p.id}"
+                       id="p_\${p.id}">
+               <div class="product-title">\${p.product_name || ""}</div>
+                <div class="meta-row meta">
+                  <span><b>ID:</b> \${p.id ?? ""}</span>
+                  <span><b>Price:</b> \$\${p.unit_price ?? ""}</span>
+                  <span><b>Available:</b> \${p.quantity_available ?? ""}</span>
+               </div>
             </div>
           </div>
+        </div>
         `).join("");
+
   }
 </script>
 
 <hr class="mt-4"/>
 <br>
-<div class="text-end mt-3">
-  <a href="checkout.jsp" class="btn btn-success btn-lg">
-    Go to Checkout
-  </a>
-</div>
 </body>
 </html>

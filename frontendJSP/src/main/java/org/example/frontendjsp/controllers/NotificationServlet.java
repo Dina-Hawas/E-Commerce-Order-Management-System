@@ -23,10 +23,6 @@ public class NotificationServlet extends HttpServlet {
         String orderId = request.getParameter("order_id");
         int customerId = Integer.parseInt(request.getParameter("customer_id"));
 
-//        if (orderId == null || customerId == null) {
-//            response.sendError(400, "Missing order_id or customer_id");
-//            return;
-//        }
 
         String jsonPayload = String.format(
                 "{\"order_id\": \"%s\", \"customer_id\": %s}",

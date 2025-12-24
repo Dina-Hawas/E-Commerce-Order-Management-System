@@ -21,6 +21,7 @@
     <p><strong>ID:</strong> <%= id %></p>
     <p><strong>Name:</strong> <%= customer.optString("name", "N/A") %></p>
     <p><strong>Email:</strong> <%= customer.optString("email", "N/A") %></p>
+    <p><strong>Phone:</strong> <%= customer.optString("phone", "N/A") %></p>
     <p><strong>Loyalty Points:</strong> <%= customer.optInt("loyalty_points", 0) %></p>
 </div>
 

@@ -8,33 +8,58 @@
 </head>
 
 <body class="container py-4">
+
 <h1>Checkout</h1>
+<%
+
+    String[] productIds = request.getParameterValues("selectedProduct");
+    String errorMessage = (String) request.getAttribute("errorMessage");
+
+%>
+
+<% if (errorMessage != null) { %>
+
+<div class="alert alert-danger"><%= errorMessage %></div>
+<a class="btn btn-secondary" href="<%= request.getContextPath() %>/products">Back to Products</a>
+
+<% } else if (productIds == null || productIds.length == 0) { %>
+
+<div class="alert alert-danger">
+    No product selected. Please choose at least one product.
+</div>
+<a class="btn btn-secondary" href="<%= request.getContextPath() %>/products">Back to Products</a>
+
+<% } else { %>
 
 <form action="<%= request.getContextPath() %>/submitOrder" method="post">
 
     <div class="mb-3">
         <label class="form-label">Customer ID</label>
-        <input class="form-control" type="text" name="customer_id"  required />
+        <input class="form-control" type="text" name="customer_id" value="1" readonly />
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">Product ID</label>
-        <input class="form-control" type="text" name="product_id" />
+    <h5>Selected Products</h5>
+
+    <% for (String pid : productIds) { %>
+    <div class="card p-3 mb-3">
+        <div class="mb-2">
+            <label class="form-label">Product ID</label>
+            <input class="form-control" type="text"
+                   name="product_id[]" value="<%= pid %>" readonly />
+        </div>
+
+        <div class="mb-2">
+            <label class="form-label">Quantity</label>
+            <input class="form-control" type="number"
+                   name="quantity[]" min="1" required />
+        </div>
     </div>
+    <% } %>
 
-    <div class="mb-3">
-        <label class="form-label">Quantity</label>
-        <input class="form-control" type="number" name="quantity"  min="1" required />
-    </div>
-
-    <div class="mt-3 d-flex gap-2">
-        <button class="btn btn-success" type="submit">Place Order</button>
-        <a class="btn btn-secondary" href="<%= request.getContextPath() %>/products">Cancel Order</a>
-    </div>
-
-
-
+    <button class="btn btn-success" type="submit">Place Order</button>
+    <a class="btn btn-secondary" href="<%= request.getContextPath() %>/products">Cancel</a>
 </form>
 
+<%}%>
 </body>
 </html>

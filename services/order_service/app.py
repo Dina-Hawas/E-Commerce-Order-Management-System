@@ -96,6 +96,15 @@ def create_order():
                 f"http://localhost:5002/api/inventory/update/{product_id}",
                 json={"quantity_available": new_qty}
             )
+            # ---- UPDATE LOYALTY POINTS (+10) ----
+            CUSTOMER_LOYALTY_URL = "http://localhost:5004/api/customers"
+            loyalty_resp = requests.put(
+                f"{CUSTOMER_LOYALTY_URL}/{customer_id}/loyalty",
+                json={"points": 10}
+            )
+
+            if loyalty_resp.status_code != 200:
+                print(" Loyalty update failed:", loyalty_resp.text)
         return jsonify(order), 201
 
     except KeyError as e:

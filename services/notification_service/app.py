@@ -34,35 +34,66 @@ def send_notification():
     if not order_id or not customer_id:
         return jsonify({"error": "Missing parameters"}), 400
 
-    customer_res = requests.get(f"http://localhost:5004/api/customers/{customer_id}")
+    # ---- Get customer ----
+    customer_res = requests.get(
+        f"http://localhost:5004/api/customers/{customer_id}"
+    )
+    if customer_res.status_code != 200:
+        return jsonify({"error": "Customer not found"}), 404
+
     customer_data = customer_res.json()
 
-    order_res =requests.get(f"http://localhost:5001/api/orders/{order_id}")
-    order_data = order_res.json()
-    product_id = order_data['products'][0]['product_id']
-    inventory_res = requests.get(f"http://localhost:5002/api/inventory/check/{product_id}")
-    inventory_data = inventory_res.json()
+    # ---- Get order ----
+    order_res = requests.get(
+        f"http://localhost:5001/api/orders/{order_id}"
+    )
+    if order_res.status_code != 200:
+        return jsonify({"error": "Order not found"}), 404
 
+    order_data = order_res.json()
+
+    # ---- Handle MULTIPLE products ----
+    product_lines = []
+
+    for item in order_data["products"]:
+        product_id = item["product_id"]
+        ordered_qty = item["quantity"]
+
+        inventory_res = requests.get(
+            f"http://localhost:5002/api/inventory/check/{product_id}"
+        )
+
+        if inventory_res.status_code != 200:
+            available_qty = "Unknown"
+        else:
+            available_qty = inventory_res.json().get("quantity_available")
+
+        product_lines.append(
+            f"Product {product_id}: ordered {ordered_qty}, available {available_qty}"
+        )
+
+    # ---- Build notification message ----
     message = (
-        f"Order #{order_id} confirmed for customer {customer_data['name']}.\n"
+        f"Order #{order_id} confirmed\n"
+        f"Customer: {customer_data['name']}\n"
         f"Email: {customer_data['email']}\n"
-        f"Stock Status: {inventory_data}"
+        f"Products:\n" +
+        "\n".join(product_lines)
     )
 
-    print("TO:", customer_data["email"])
-    print("MESSAGE:", message)
-    print("=====================================\n")
-
+    # ---- Store notification ----
     cursor.execute(
         "INSERT INTO notification_log (customer_id, message) VALUES (%s, %s)",
         (customer_id, message)
     )
     db.commit()
 
+    # ---- Return response ----
     return jsonify({
         "status": "sent",
-        "message": message
-    })
+        "message": message,
+        "products_count": len(product_lines)
+    }), 200
 
 if __name__ == "__main__":
     app.run(port=5005, debug=True)

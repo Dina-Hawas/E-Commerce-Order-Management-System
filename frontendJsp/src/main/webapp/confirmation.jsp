@@ -1,8 +1,8 @@
-<%@ page import="org.json.JSONObject" %>
 <%@ page import="org.json.JSONArray" %>
+<%@ page import="org.json.JSONObject" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8"/>
@@ -15,40 +15,34 @@
 
 <h2>Order Confirmation</h2>
 
-<p>
-    <strong>Order ID:</strong> ${orderId}
-    <br/>
+<p><strong>Order ID:</strong> ${orderId}</p>
+<p><strong>Status:</strong> ${status}</p>
+<p><strong>Timestamp:</strong> ${timestamp}</p>
 
-    <%
-        JSONObject pricing = (JSONObject) request.getAttribute("pricing");
-        JSONArray items = (JSONArray) request.getAttribute("items");
+<hr/>
 
-        for (int i = 0; i < items.length(); i++) {
-            JSONObject item = items.getJSONObject(i);
-    %>
+<%
+    JSONArray items = (JSONArray) request.getAttribute("items");
 
-    <strong>product:</strong><%= item.getString("produc_name") %>
-    <br/>
-    <strong>unit price:</strong><%= item.getDouble("unit_price") %>
-    <br/>
-    <strong>quantity:</strong><%= item.getInt("quantity") %>
-    <br/>
-    <strong>total price after discount:</strong><%= item.getDouble("total_after_discount") %>
-    <br/>
-    <strong>tax amount:</strong> <%= pricing.getDouble("tax_amount")%>
-    <br/>
-    <strong>grand total:</strong> <%= pricing.getDouble("grand_total")%>
-    <br/>
-    <strong>status:</strong> ${status}
-    <br/>
-    <strong>timestamp:</strong> ${timestamp}
-    <br/>
+    for (int i = 0; i < items.length(); i++) {
+        JSONObject item = items.getJSONObject(i);
+%>
 
-    <%
-        }
-    %>
+<div class="card p-3 mb-3">
+    <p><strong>Product:</strong> <%= item.getString("produc_name") %></p>
+    <p><strong>Unit Price:</strong> <%= item.getDouble("unit_price") %></p>
+    <p><strong>Quantity:</strong> <%= item.getInt("quantity") %></p>
+    <p><strong>Total after discount:</strong> <%= item.getDouble("total_after_discount") %></p>
+</div>
 
-</p>
+<%
+    }
+%>
+
+<hr/>
+
+<p><strong>Tax Amount:</strong> ${taxAmount}</p>
+<p><strong>Grand Total:</strong> ${grandTotal}</p>
 
 <form action="${pageContext.request.contextPath}/sendNotification" method="post">
     <input type="hidden" name="order_id" value="${orderId}" />
